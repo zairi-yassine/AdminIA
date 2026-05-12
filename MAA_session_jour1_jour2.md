@@ -1,4 +1,5 @@
-# MAA — Session de Travail Jour 1 & Jour 2
+# MAA — Session de Travail Jour 1 à Jour 5
+
 ## Documentation Complète de la Conversation
 
 > **Date** : 12 Mai 2026  
@@ -17,7 +18,10 @@
 5. [Jour 2 — Smart Recommendations](#5-jour-2--smart-recommendations)
 6. [Git — Nettoyage et push](#6-git--nettoyage-et-push)
 7. [Décisions techniques prises](#7-décisions-techniques-prises)
-8. [État final du projet](#8-état-final-du-projet)
+8. [Jour 3 — Multi-Sessions Persistantes + Streamlit Polish](#8-jour-3--multi-sessions-persistantes--streamlit-polish)
+9. [Jour 4 — Export PDF + App v0.5](#9-jour-4--export-pdf--app-v05)
+10. [Jour 5 — RAG + ChromaDB](#10-jour-5--rag--chromadb)
+11. [État final du projet](#11-état-final-du-projet)
 
 ---
 
@@ -52,6 +56,7 @@ MAA/
 ### Problème identifié dans `services/llm.py`
 
 Les lignes 65-66 contenaient des tokens garbage :
+
 ```python
 # AVANT (cassé)
     def change_model(self, model_name: str):
@@ -67,6 +72,7 @@ Les lignes 65-66 contenaient des tokens garbage :
 ## 2. Lecture du fichier de référence
 
 Le fichier `MAA_conversation_complete.md` a été lu intégralement. Il contient :
+
 - L'architecture 5 couches (L1 à L5)
 - Les codes sources complets pour chaque module
 - Le planning 10 jours
@@ -75,16 +81,16 @@ Le fichier `MAA_conversation_complete.md` a été lu intégralement. Il contient
 
 **Planning retenu :**
 
-| Jour | Phase | Livrable soir |
-|---|---|---|
-| **Lundi S1** | Knowledge Base + LLM | 5 JSON + Planner lit KB |
-| **Mardi S1** | Agent ReAct complet | CLI fonctionnel + Smart Rec |
-| Mercredi S1 | Multi-sessions + Streamlit | UI + sessions persistantes |
-| Jeudi S1 | Polish + Export PDF | App complète v0.5 |
-| Lundi S2 | RAG + ChromaDB | Zéro hallucination |
-| Mardi S2 | PDF formulaires + Arabe | PDF pré-rempli + bilingue |
-| Mercredi S2 | MLflow + 20 tests | Dashboard + métriques |
-| Jeudi S2 | Rapport + Démo | Projet 100% livré |
+| Jour            | Phase                      | Livrable soir               |
+| --------------- | -------------------------- | --------------------------- | --- |
+| **Lundi S1**    | Knowledge Base + LLM       | 5 JSON + Planner lit KB     |
+| **Mardi S1**    | Agent ReAct complet        | CLI fonctionnel + Smart Rec |
+| **Mercredi S1** | Multi-sessions + Streamlit | UI + sessions persistantes  | ✅  |
+| **Jeudi S1**    | Polish + Export PDF        | App complète v0.5           | ✅  |
+| **Lundi S2**    | RAG + ChromaDB             | Zéro hallucination          | ✅  |
+| Mardi S2        | PDF formulaires + Arabe    | PDF pré-rempli + bilingue   |
+| Mercredi S2     | MLflow + 20 tests          | Dashboard + métriques       |
+| Jeudi S2        | Rapport + Démo             | Projet 100% livré           |
 
 ---
 
@@ -93,17 +99,19 @@ Le fichier `MAA_conversation_complete.md` a été lu intégralement. Il contient
 ### 3.1 Fichiers créés
 
 #### `data/kb/sarl_au.json`
+
 5 étapes — Frais : 3000–5000 MAD — Durée : 2 à 4 semaines
 
-| Étape | Organisme | Frais |
-|---|---|---|
-| 1. Profil du fondateur | — | 0 MAD |
-| 2. Capital et siège social | — | 0 MAD |
-| 3. Certificat Négatif OMPIC | OMPIC | 170 MAD |
-| 4. Statuts notariés + dépôt capital | Notaire + Banque | 2000 MAD |
-| 5. Immatriculation RC + DGI + CNSS | Tribunal / DGI / CNSS | 350 MAD |
+| Étape                               | Organisme             | Frais    |
+| ----------------------------------- | --------------------- | -------- |
+| 1. Profil du fondateur              | —                     | 0 MAD    |
+| 2. Capital et siège social          | —                     | 0 MAD    |
+| 3. Certificat Négatif OMPIC         | OMPIC                 | 170 MAD  |
+| 4. Statuts notariés + dépôt capital | Notaire + Banque      | 2000 MAD |
+| 5. Immatriculation RC + DGI + CNSS  | Tribunal / DGI / CNSS | 350 MAD  |
 
 **Chaque étape contient :**
+
 - `infos_requises` — clés des champs à collecter
 - `labels_infos` — questions en langage naturel (affiché à l'utilisateur)
 - `docs_requis` — liste des documents nécessaires
@@ -112,23 +120,29 @@ Le fichier `MAA_conversation_complete.md` a été lu intégralement. Il contient
 - `lien_officiel` — URL officielle
 
 #### `data/kb/cnss.json`
+
 4 étapes — Frais : 0 MAD — Durée : 3 à 5 jours
 
 #### `data/kb/ompic.json`
+
 5 étapes — Frais : 650 MAD/classe — Durée : 12 à 18 mois
 
 #### `data/kb/dgi.json`
+
 4 étapes — Frais : 0 MAD — Durée : 1 à 3 jours
 
 #### `data/kb/rc.json`
+
 4 étapes — Frais : 350 MAD — Durée : 3 à 7 jours
 
 ---
 
 #### `data/__init__.py`
+
 Package Python pour le module data.
 
 #### `data/db.py`
+
 Initialisation SQLite avec les 4 tables du schéma :
 
 ```python
@@ -181,6 +195,7 @@ class KBLoader:
 ```
 
 Détection d'intention par keywords (dict ordonné, spécifique avant générique) :
+
 - `sarl_au`, `cnss`, `ompic`, `dgi`, `rc`, `recommandation`, `unknown`
 
 ---
@@ -204,12 +219,12 @@ class ContextManager:
 
 Design Jour 1 vs design doc :
 
-| Ancien (doc) | Nouveau (implémenté) |
-|---|---|
-| `PLANS` hardcodé dans la classe | Charge depuis `data/kb/*.json` |
-| Pas de labels humains | `missing_info_label()` → question claire |
-| Pas de docs par étape | `get_current_step_docs()` |
-| Pas de frais totaux | `get_total_fees()` |
+| Ancien (doc)                    | Nouveau (implémenté)                     |
+| ------------------------------- | ---------------------------------------- |
+| `PLANS` hardcodé dans la classe | Charge depuis `data/kb/*.json`           |
+| Pas de labels humains           | `missing_info_label()` → question claire |
+| Pas de docs par étape           | `get_current_step_docs()`                |
+| Pas de frais totaux             | `get_total_fees()`                       |
 
 ```python
 class StepStatus(Enum):
@@ -302,15 +317,15 @@ Planner.record_info()   → avance dans l'étape
 
 ### 4.2 Pourquoi chaque choix
 
-| Choix | Raison |
-|---|---|
-| JSON pour la KB | Lisible, modifiable sans code, versionnable |
-| KB-driven Planner | Ajouter une procédure = 1 fichier JSON, 0 code |
-| SQLite | Sans serveur, portable, idéal démo jury |
-| Streamlit | Zéro HTML/CSS, 1 commande pour lancer |
-| Ollama local | Gratuit, offline, zéro quota, idéal démo |
-| ReAct pattern | Observable, explicable, testable |
-| 5 couches | Séparation responsabilités, testabilité indépendante |
+| Choix             | Raison                                               |
+| ----------------- | ---------------------------------------------------- |
+| JSON pour la KB   | Lisible, modifiable sans code, versionnable          |
+| KB-driven Planner | Ajouter une procédure = 1 fichier JSON, 0 code       |
+| SQLite            | Sans serveur, portable, idéal démo jury              |
+| Streamlit         | Zéro HTML/CSS, 1 commande pour lancer                |
+| Ollama local      | Gratuit, offline, zéro quota, idéal démo             |
+| ReAct pattern     | Observable, explicable, testable                     |
+| 5 couches         | Séparation responsabilités, testabilité indépendante |
 
 ---
 
@@ -322,12 +337,12 @@ Planner.record_info()   → avance dans l'étape
 
 4 statuts complets avec avantages, inconvénients, lien officiel, et mapping vers procédure MAA :
 
-| Statut | Procédure MAA |
-|---|---|
+| Statut              | Procédure MAA  |
+| ------------------- | -------------- |
 | `auto_entrepreneur` | `None` (KB v2) |
-| `sarl_au` | `"sarl_au"` ✅ |
-| `sarl` | `None` (KB v2) |
-| `sa` | `None` (KB v2) |
+| `sarl_au`           | `"sarl_au"` ✅ |
+| `sarl`              | `None` (KB v2) |
+| `sa`                | `None` (KB v2) |
 
 #### `Recommender` — Classe
 
@@ -342,6 +357,7 @@ class Recommender:
 ```
 
 **4 questions posées :**
+
 1. `nb_associes` — nombre de fondateurs
 2. `ca_previsionnel` — CA annuel prévisionnel (MAD)
 3. `type_activite` — service / commerce / artisanat / industrie
@@ -362,6 +378,7 @@ elif nb >= 2:
 ```
 
 **Pourquoi un arbre de décision et pas le LLM ?**
+
 - **Déterministe** — même profil = même recommandation (testable)
 - **Fiable** — pas d'hallucination sur les seuils légaux (500K MAD, 300K MAD)
 - Le LLM est utilisé uniquement pour **présenter** la recommandation, pas pour la **calculer**
@@ -418,14 +435,14 @@ def respond(self, user_message: str) -> str:
 def _handle_recommendation_collection(self, message: str) -> str:
     # 1. Enregistre la réponse à la question courante
     self.recommender.record(key, message)
-    
+
     # 2. Profil complet ?
     if self.recommender.is_profile_complete():
         result = self.recommender.analyze()
         if result["procedure_id"]:
             self._pending_procedure = result["procedure_id"]  # → Phase 2
         # LLM présente la recommandation
-    
+
     # 3. Sinon, poser la question suivante
     else:
         # LLM pose la question suivante
@@ -436,7 +453,7 @@ def _handle_recommendation_collection(self, message: str) -> str:
 ```python
 def _handle_procedure_confirmation(self, message: str) -> str:
     _POSITIVE_WORDS = {"oui", "ok", "d'accord", "allons-y", ...}
-    
+
     if confirmed:
         self.planner.create_plan(procedure_id)  # → Phase 3
     else:
@@ -543,86 +560,232 @@ Jour 2 : 6 files changed, 1209 insertions(+)
 
 ### Décisions Jour 1
 
-| Décision | Alternative rejetée | Raison du choix |
-|---|---|---|
-| KB-driven Planner | PLANS hardcodé | Ajouter procédure = 1 JSON, 0 code |
-| `labels_infos` dans JSON | Labels dans le code | Modifiable sans redéploiement |
-| `detect_intent()` dans KBLoader | Dans AgentCore | KBLoader connaît la KB, pas l'agent |
-| `init_db()` dans `app.py` | Script séparé | Garantit l'init au premier lancement |
+| Décision                        | Alternative rejetée | Raison du choix                      |
+| ------------------------------- | ------------------- | ------------------------------------ |
+| KB-driven Planner               | PLANS hardcodé      | Ajouter procédure = 1 JSON, 0 code   |
+| `labels_infos` dans JSON        | Labels dans le code | Modifiable sans redéploiement        |
+| `detect_intent()` dans KBLoader | Dans AgentCore      | KBLoader connaît la KB, pas l'agent  |
+| `init_db()` dans `app.py`       | Script séparé       | Garantit l'init au premier lancement |
 
 ### Décisions Jour 2
 
-| Décision | Alternative rejetée | Raison du choix |
-|---|---|---|
-| Arbre de décision Python | LLM pour recommander | Déterministe, testable, pas d'hallucination |
-| `_pending_procedure` flag | Démarrer directement | UX : confirmation explicite de l'utilisateur |
-| `Recommender` séparé de `Planner` | Une seule classe | Responsabilités distinctes (SRP) |
-| Intent `recommandation` en dernier | En premier | Évite les conflits avec intents spécifiques |
+| Décision                           | Alternative rejetée  | Raison du choix                              |
+| ---------------------------------- | -------------------- | -------------------------------------------- |
+| Arbre de décision Python           | LLM pour recommander | Déterministe, testable, pas d'hallucination  |
+| `_pending_procedure` flag          | Démarrer directement | UX : confirmation explicite de l'utilisateur |
+| `Recommender` séparé de `Planner`  | Une seule classe     | Responsabilités distinctes (SRP)             |
+| Intent `recommandation` en dernier | En premier           | Évite les conflits avec intents spécifiques  |
 
 ---
 
-## 8. État final du projet
+## 8. Jour 3 — Multi-Sessions Persistantes + Streamlit Polish
+
+### 8.1 Nouveau fichier : `services/session_manager.py`
+
+CRUD complet sur les 4 tables SQLite — 12 méthodes :
+
+```python
+class SessionManager:
+    # Sessions
+    def create_session(procedure_id=None) -> str   # UUID v4
+    def update_session(session_id, **kwargs)
+    def get_session(session_id) -> dict | None
+    def list_sessions(limit=10) -> list[dict]      # triées updated_at DESC
+    def close_session(session_id)                  # status -> "closed"
+
+    # Messages
+    def save_message(session_id, role, content)
+    def get_messages(session_id) -> list[dict]
+
+    # Collected info
+    def save_collected_info(session_id, step_id, key, value)
+    def get_collected_info(session_id) -> list[dict]
+
+    # Steps progress
+    def upsert_step_progress(session_id, step_id, title, status)
+    def get_steps_progress(session_id) -> list[dict]
+```
+
+### 8.2 Intégration dans `agent/core.py`
+
+#### Nouveaux attributs
+
+```python
+class AgentCore:
+    self.session_mgr: SessionManager = SessionManager()
+    self.session_id:  str | None     = None
+```
+
+#### 4 hooks dans `respond()` — persistance complète
+
+```python
+def respond(self, user_message):
+    if not self.session_id:
+        self.session_id = self.session_mgr.create_session()   # 1. créer
+    self.session_mgr.save_message(session_id, "user", ...)    # 2. user
+    # ... logique ...
+    self.session_mgr.save_message(session_id, "assistant", .) # 3. assistant
+    self._sync_steps_to_db()                                   # 4. steps
+```
+
+Dans `_handle_collection()` : `save_collected_info()` après chaque réponse.
+Dans `reset()` : `close_session()` + `session_id = None`.
+
+### 8.3 Sidebar enrichie `app.py`
+
+- **Infos collectées** — clé/valeur affichées en temps réel
+- **Session courante** — UUID court (8 chars)
+- **Sessions récentes** — 5 dernières (date, procédure, nb msgs, statut actif/fermé)
+
+### 8.4 Tests — 16 tests (`tests/conftest.py` + `tests/test_session_manager.py`)
+
+Fixture `tmp_db` = base SQLite isolée par test via `monkeypatch.setattr(data.db, "DB_PATH", ...)`.
+
+```
+64 / 64 tests  (25 planner + 23 recommender + 16 session_manager)
+Commit Jour 3 pousse sur GitHub
+```
+
+---
+
+## 9. Jour 4 — Export PDF + App v0.5
+
+### 9.1 Nouveau fichier : `tools/doc_gen.py`
+
+```python
+class PDFGenerator:
+    def generate_summary(
+        procedure, collected_info, plan, session_id=""
+    ) -> bytes   # PDF valide (%PDF...)
+```
+
+**5 sections** : en-tête vert MAA · infos générales · infos collectées · plan des étapes · pied de page.
+
+**Bug fpdf2 résolu** — `_safe()` remplace les caractères hors Latin-1 (`—` U+2014, smart quotes...) avant de passer à Helvetica.
+
+### 9.2 Améliorations `app.py`
+
+- **Banner** `Toutes les informations ont été collectées` + bouton `Télécharger le résumé PDF`
+- **Gestion erreur Ollama** — try/except avec message explicite
+
+### 9.3 Tests — 9 tests (`tests/test_doc_gen.py`)
+
+```
+73 / 73 tests  (+ 9 doc_gen)
+Commit Jour 4 pousse sur GitHub
+```
+
+---
+
+## 10. Jour 5 — RAG + ChromaDB
+
+### 10.1 Nouveau fichier : `services/rag.py`
+
+```python
+class RAGService:
+    def __init__(persist_dir, ephemeral=False, embedding_function=None)
+    def index_kb(kb_loader, force=False)              # 27 docs, idempotent
+    def query(text, n_results=3, procedure_id=None) -> str
+    def is_indexed() -> bool
+    def count() -> int
+```
+
+**27 documents** = 5 overviews + 22 étapes (5+4+5+4+4).
+**Stockage** : `data/vectors/` (PersistentClient, git-ignoré, régénérable).
+
+### 10.2 Intégration dans `agent/core.py`
+
+```python
+# __init__
+self.rag = RAGService()
+try: self.rag.index_kb(self.kb_loader)
+except Exception: pass   # non critique
+
+# Phase 0 — procédure détectée
+rag_context = self.rag.query(message, n_results=2, procedure_id=procedure_id)
+system += f"Documentation officielle :\n{rag_context}\n"
+
+# Phase 4 — finalisation
+rag_context = self.rag.query(f"etapes documents {proc['titre']}", n_results=3, ...)
+```
+
+**Effet** : frais exacts, délais officiels et documents requis injectés dans le prompt → zéro hallucination KB.
+
+### 10.3 Tests — 13 tests (`tests/test_rag.py`)
+
+`DummyEF` = embeddings SHA-256 déterministes, zéro téléchargement de modèle.
+
+```
+86 / 86 tests  (+ 13 rag)
+Commit Jour 5 pousse sur GitHub
+```
+
+---
+
+## 11. État final du projet (après Jour 5)
 
 ### Structure complète
 
 ```
 MAA/
 ├── agent/
-│   ├── context.py        ✅ ContextManager (mémoire session)
-│   ├── core.py           ✅ AgentCore (5 phases ReAct)
-│   └── planner.py        ✅ Planner KB-driven (StepStatus)
+│   ├── context.py             ✅ ContextManager
+│   ├── core.py                ✅ AgentCore (5 phases + RAG + SessionMgr)
+│   └── planner.py             ✅ Planner KB-driven
 ├── services/
-│   ├── kb_loader.py      ✅ KBLoader (5 intents + recommandation)
-│   ├── llm.py            ✅ LLMService (Ollama/OpenRouter)
-│   ├── recommender.py    ✅ Recommender (4 statuts)
-│   └── rag.py            ⏳ RAGService (Jour 5)
+│   ├── kb_loader.py           ✅ KBLoader (6 intents)
+│   ├── llm.py                 ✅ LLMService (Ollama/OpenRouter)
+│   ├── rag.py                 ✅ RAGService (ChromaDB 1.5.7)
+│   ├── recommender.py         ✅ Recommender (arbre décision)
+│   └── session_manager.py     ✅ SessionManager (CRUD SQLite)
 ├── data/
 │   ├── kb/
-│   │   ├── sarl_au.json  ✅ 5 étapes
-│   │   ├── cnss.json     ✅ 4 étapes
-│   │   ├── ompic.json    ✅ 5 étapes
-│   │   ├── dgi.json      ✅ 4 étapes
-│   │   └── rc.json       ✅ 4 étapes
-│   ├── db.py             ✅ SQLite 4 tables
-│   ├── templates/        ⏳ PDF (Jour 6)
-│   └── vectors/          ⏳ ChromaDB (Jour 5)
+│   │   ├── sarl_au.json       ✅ 5 étapes
+│   │   ├── cnss.json          ✅ 4 étapes
+│   │   ├── ompic.json         ✅ 5 étapes
+│   │   ├── dgi.json           ✅ 4 étapes
+│   │   └── rc.json            ✅ 4 étapes
+│   ├── db.py                  ✅ SQLite init (4 tables)
+│   ├── sessions.db            ⏳ runtime (git-ignoré)
+│   └── vectors/               ✅ ChromaDB index (git-ignoré)
 ├── tools/
-│   └── doc_gen.py        ⏳ Génération PDF (Jour 6)
+│   └── doc_gen.py             ✅ PDFGenerator (fpdf2)
 ├── tests/
-│   ├── test_planner.py   ✅ 25 tests
-│   └── test_recommender.py ✅ 23 tests
+│   ├── conftest.py            ✅ fixture tmp_db
+│   ├── test_planner.py        ✅ 25 tests
+│   ├── test_recommender.py    ✅ 23 tests
+│   ├── test_session_manager.py ✅ 16 tests
+│   ├── test_doc_gen.py        ✅  9 tests
+│   └── test_rag.py            ✅ 13 tests
 ├── docs/
-│   ├── JOUR1.md          ✅ Documentation flux pipeline
-│   └── JOUR2.md          ✅ Documentation Smart Rec
-├── app.py                ✅ Streamlit UI
-├── README.md             ✅ Documentation complète
-└── .env.example          ✅ Template configuration
+│   ├── JOUR1.md - JOUR5.md    ✅
+├── app.py                     ✅ Streamlit v0.5 (banner + PDF + sessions)
+├── README.md                  ✅
+└── .env.example               ✅
 ```
 
-### Métriques
+### Métriques cumulées
 
-| Métrique | Valeur |
-|---|---|
-| Tests unitaires | **48 / 48 ✅** |
-| Procédures KB | **5** (sarl_au, cnss, ompic, dgi, rc) |
-| Statuts juridiques | **4** (Auto-ent, SARL AU, SARL, SA) |
-| Phases agent | **5** (routing, reco, confirmation, collecte, finalisation) |
-| Lignes de code | ~1200 lignes (hors JSON et docs) |
-| Commits GitHub | **2** (Jour 1 + Jour 2) |
+| Métrique              | Jours 1-2 | Jours 3-5 | Total          |
+| --------------------- | --------- | --------- | -------------- |
+| Tests unitaires       | 48        | 38        | **86 / 86 ✅** |
+| Fichiers Python créés | 10        | 5         | **15**         |
+| Phases agent          | 5         | 5         | **5**          |
+| Documents ChromaDB    | 0         | 27        | **27**         |
+| Commits GitHub        | 2         | 3         | **5**          |
 
-### Prochaines étapes (Jour 3)
+### Prochaines étapes (Jour 6)
 
 ```
-Jour 3 — Mercredi S1 :
-  - Multi-sessions persistantes (SQLite branché dans l'agent)
-  - Session ID unique par conversation
-  - Streamlit polish (affichage messages amélioré)
-  - Livrable : App complète avec sessions persistantes
+Jour 6 — Mardi S2 :
+  - PDF bilingue Arabe/Francais (polices TTF DejaVu/Amiri)
+  - Interface Streamlit RTL/LTR
+  - Formulaires pre-remplis
 ```
 
 ---
 
-## 9. Commandes de référence
+## 12. Commandes de référence
 
 ```powershell
 # Avant chaque session de travail
@@ -632,7 +795,7 @@ ollama serve                          # Terminal 1 — laisser ouvert
 uv run streamlit run app.py           # → http://localhost:8501
 
 # Tests
-uv run pytest tests/ -v              # 48 tests
+uv run pytest tests/ -v              # 86 tests
 
 # Git
 git add -A
@@ -642,4 +805,4 @@ git push origin main
 
 ---
 
-*Document généré depuis la session de travail MAA — 12 Mai 2026*
+_Document mis à jour — Session Jours 1 à 5 — MAA · 12 Mai 2026_

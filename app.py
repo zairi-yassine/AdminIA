@@ -3,6 +3,7 @@ from datetime import datetime
 import streamlit as st
 from agent.core import AgentCore
 from data.db import init_db
+from services.i18n import t
 
 st.set_page_config(
     page_title="MAA — Morocco Administrative Agent",
@@ -16,26 +17,52 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 if "agent" not in st.session_state:
     st.session_state.agent = AgentCore()
+if "lang" not in st.session_state:
+    st.session_state.lang = "fr"
 
 agent: AgentCore = st.session_state.agent
 
-# ── Sidebar ────────────────────────────────────────────────────────────
+lang: str = st.session_state.lang
+
+# ── RTL CSS (Arabe) ───────────────────────────────────────────────────────
+if lang == "ar":
+    st.markdown(
+        """<style>
+        .stChatMessage p, .stChatMessage li { direction: rtl; text-align: right; }
+        .stMarkdown p, .stMarkdown li      { direction: rtl; text-align: right; }
+        .stCaption                          { direction: rtl; text-align: right; }
+        </style>""",
+        unsafe_allow_html=True,
+    )
+
+# ── Sidebar ────────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown("## 🇲🇦 MAA")
     st.caption("Morocco Administrative Agent")
     st.divider()
+
+    # ── Sélecteur de langue ───────────────────────────────────────────
+    lang_choice = st.selectbox(
+        t("sidebar_lang", lang),
+        options=["Français 🇫🇷", "العربية 🇲🇦"],
+        index=0 if lang == "fr" else 1,
+    )
+    new_lang = "ar" if "عرب" in lang_choice else "fr"
+    if new_lang != lang:
+        st.session_state.lang = new_lang
+        st.rerun()
 
     # ── Progression ────────────────────────────────────────────────────
     progress    = agent.planner.progress()
     total_steps = len(agent.planner.plan)
     done_steps  = int(progress * total_steps) if total_steps else 0
 
-    st.markdown("**📊 Progression**")
+    st.markdown(f"**📊 {t('sidebar_progress', lang)}**")
     st.progress(progress)
     if total_steps:
-        st.caption(f"{done_steps} / {total_steps} étape(s) complétée(s)")
+        st.caption(f"{done_steps} / {total_steps}")
     else:
-        st.caption("En attente de votre demande…")
+        st.caption("..." if lang == "ar" else "En attente de votre demande…")
 
     # ── Plan en cours ──────────────────────────────────────────────────
     if agent.planner.plan:
@@ -55,7 +82,7 @@ with st.sidebar:
     # ── Infos collectées ───────────────────────────────────────────────
     if agent.context.collected_info:
         st.divider()
-        st.markdown("**📝 Infos collectées**")
+        st.markdown(f"**📝 {t('sidebar_collected', lang)}**")
         for key, val in agent.context.collected_info.items():
             label = key.replace("_", " ").title()
             st.caption(f"• **{label}** : {val}")
@@ -64,11 +91,11 @@ with st.sidebar:
     if agent.session_id:
         st.divider()
         short_id = agent.session_id[:8]
-        st.caption(f"🔑 Session : `{short_id}…`")
+        st.caption(f"🔑 {t('sidebar_session', lang)} : `{short_id}…`")
 
     # ── Sessions récentes ──────────────────────────────────────────────
     st.divider()
-    st.markdown("**🕑 Sessions récentes**")
+    st.markdown(f"**🕑 {t('sidebar_recent', lang)}**")
     try:
         sessions = agent.session_mgr.list_sessions(limit=5)
         if sessions:
@@ -85,34 +112,31 @@ with st.sidebar:
 
     # ── Procédures disponibles ─────────────────────────────────────────
     st.divider()
-    st.markdown("**🗂️ Procédures disponibles**")
+    st.markdown(f"**🗂️ {t('sidebar_procedures', lang)}**")
     try:
         from services.kb_loader import KBLoader
         for proc in KBLoader().list_procedures():
-            st.caption(f"� {proc['titre']}")
+            st.caption(f"• {proc['titre']}")
     except Exception:
         pass
 
     # ── Nouvelle conversation ──────────────────────────────────────────
     st.divider()
-    if st.button("🔄 Nouvelle conversation", use_container_width=True):
+    if st.button(f"🔄 {t('sidebar_new', lang)}", use_container_width=True):
         agent.reset()
         st.session_state.messages = []
         st.rerun()
 
 # ── Main area ──────────────────────────────────────────────────────────
-st.title("🇲🇦 MAA — Morocco Administrative Agent")
-st.caption("Assistant intelligent pour vos démarches administratives au Maroc")
+st.title(f"🇲🇦 {t('app_title', lang)}")
+st.caption(t("app_caption", lang))
 
 # ── Completion banner + PDF ────────────────────────────────────────────
 if agent.planner.is_complete():
-    st.success(
-        "✅ Toutes les informations ont été collectées ! "
-        "Téléchargez votre résumé PDF ci-dessous."
-    )
+    st.success(f"✅ {t('completion_msg', lang)}")
     try:
-        from tools.doc_gen import PDFGenerator
-        pdf_bytes = PDFGenerator().generate_summary(
+        from tools.pdf_bilingual import BilingualPDFGenerator
+        pdf_bytes = BilingualPDFGenerator().generate_bilingual(
             procedure      = agent.planner.procedure,
             collected_info = agent.context.collected_info,
             plan           = agent.planner.plan,
@@ -123,14 +147,14 @@ if agent.planner.is_complete():
             f"{datetime.now().strftime('%Y%m%d_%H%M')}.pdf"
         )
         st.download_button(
-            label             = "📥 Télécharger le résumé PDF",
-            data              = pdf_bytes,
-            file_name         = filename,
-            mime              = "application/pdf",
+            label               = t("pdf_download", lang),
+            data                = pdf_bytes,
+            file_name           = filename,
+            mime                = "application/pdf",
             use_container_width = True,
         )
     except Exception as exc:
-        st.warning(f"PDF non disponible : {exc}")
+        st.warning(f"{t('pdf_unavailable', lang)} : {exc}")
     st.divider()
 
 if not st.session_state.messages:
@@ -153,7 +177,7 @@ for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
-user_input = st.chat_input("Décrivez votre démarche administrative…")
+user_input = st.chat_input(t("chat_placeholder", lang))
 if user_input:
     st.session_state.messages.append({"role": "user", "content": user_input})
     with st.chat_message("user"):
