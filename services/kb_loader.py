@@ -6,8 +6,8 @@ KB_DIR = Path(__file__).parent.parent / "data" / "kb"
 _INTENT_KEYWORDS: dict[str, list[str]] = {
     "sarl_au": [
         "sarl au", "sarl à associé unique", "sarl a associé",
-        "créer une société", "créer une sarl", "créer ma société",
-        "ouvrir une société", "monter une société", "créer mon entreprise",
+        "créer une sarl", "créer ma société", "créer ma sarl",
+        "ouvrir une société", "monter une société",
     ],
     "cnss": [
         "cnss", "sécurité sociale", "immatricul", "cotisation",
@@ -24,6 +24,14 @@ _INTENT_KEYWORDS: dict[str, list[str]] = {
     "rc": [
         "registre de commerce", " rc ", "immatriculation rc",
         "tribunal de commerce", "extrait rc", "numéro rc",
+    ],
+    "recommandation": [
+        "créer une entreprise", "créer mon entreprise", "lancer une entreprise",
+        "monter un business", "monter mon business", "créer une startup",
+        "quelle forme juridique", "quel statut juridique", "quelle structure",
+        "je ne sais pas quel type", "conseille moi", "recommande moi",
+        "aide moi à choisir", "quel est le meilleur statut", "quel statut choisir",
+        "auto entrepreneur ou sarl", "sarl ou auto", "quelle société",
     ],
 }
 
