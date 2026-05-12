@@ -1,7 +1,10 @@
+import time
+
 from agent.context import ContextManager
 from agent.planner import Planner
 from services.kb_loader import KBLoader
 from services.llm import LLMService
+from services.mlflow_tracker import MLflowTracker
 from services.recommender import Recommender
 from services.rag import RAGService
 from services.session_manager import SessionManager
@@ -27,6 +30,8 @@ class AgentCore:
             self.rag.index_kb(self.kb_loader)
         except Exception:
             pass
+        self.tracker:            MLflowTracker   = MLflowTracker()
+        self._call_count:        int             = 0
 
     # ------------------------------------------------------------------
     # Main entry point
@@ -35,9 +40,19 @@ class AgentCore:
     def respond(self, user_message: str) -> str:
         if not self.session_id:
             self.session_id = self.session_mgr.create_session()
+            try:
+                self.tracker.start_session(
+                    self.session_id,
+                    lang=getattr(self, "_lang", "fr"),
+                    llm_model=self.llm.model,
+                )
+            except Exception:
+                pass
 
         self.context.add_message("user", user_message)
         self.session_mgr.save_message(self.session_id, "user", user_message)
+
+        _t0 = time.perf_counter()
 
         if self._in_recommendation:
             response = self._handle_recommendation_collection(user_message)
@@ -49,6 +64,25 @@ class AgentCore:
             response = self._handle_collection(user_message)
         else:
             response = self._handle_completion()
+
+        _elapsed_ms = (time.perf_counter() - _t0) * 1000
+        self._call_count += 1
+
+        try:
+            self.tracker.log_response(
+                response_time_ms=_elapsed_ms,
+                intent=self.context.procedure_id,
+                step=self._call_count,
+            )
+            if self.planner.plan:
+                self.tracker.log_progress(
+                    progress=self.planner.progress(),
+                    steps_done=int(self.planner.progress() * len(self.planner.plan)),
+                    steps_total=len(self.planner.plan),
+                    step=self._call_count,
+                )
+        except Exception:
+            pass
 
         self.context.add_message("assistant", response)
         self.session_mgr.save_message(self.session_id, "assistant", response)
@@ -273,9 +307,14 @@ class AgentCore:
     def reset(self):
         if self.session_id:
             self.session_mgr.close_session(self.session_id)
+        try:
+            self.tracker.end_session(completed=self.planner.is_complete())
+        except Exception:
+            pass
         self.planner             = Planner(kb_loader=self.kb_loader)
         self.context             = ContextManager()
         self.recommender         = Recommender()
         self._in_recommendation  = False
         self._pending_procedure  = None
         self.session_id          = None
+        self._call_count         = 0
