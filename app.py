@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import streamlit as st
 from agent.core import AgentCore
 from data.db import init_db
@@ -102,6 +104,35 @@ with st.sidebar:
 st.title("🇲🇦 MAA — Morocco Administrative Agent")
 st.caption("Assistant intelligent pour vos démarches administratives au Maroc")
 
+# ── Completion banner + PDF ────────────────────────────────────────────
+if agent.planner.is_complete():
+    st.success(
+        "✅ Toutes les informations ont été collectées ! "
+        "Téléchargez votre résumé PDF ci-dessous."
+    )
+    try:
+        from tools.doc_gen import PDFGenerator
+        pdf_bytes = PDFGenerator().generate_summary(
+            procedure      = agent.planner.procedure,
+            collected_info = agent.context.collected_info,
+            plan           = agent.planner.plan,
+            session_id     = agent.session_id or "",
+        )
+        filename = (
+            f"MAA_{agent.context.procedure_id}_"
+            f"{datetime.now().strftime('%Y%m%d_%H%M')}.pdf"
+        )
+        st.download_button(
+            label             = "📥 Télécharger le résumé PDF",
+            data              = pdf_bytes,
+            file_name         = filename,
+            mime              = "application/pdf",
+            use_container_width = True,
+        )
+    except Exception as exc:
+        st.warning(f"PDF non disponible : {exc}")
+    st.divider()
+
 if not st.session_state.messages:
     with st.chat_message("assistant"):
         st.markdown(
@@ -130,7 +161,14 @@ if user_input:
 
     with st.chat_message("assistant"):
         with st.spinner("MAA réfléchit…"):
-            response = agent.respond(user_input)
+            try:
+                response = agent.respond(user_input)
+            except Exception as exc:
+                response = (
+                    "⚠️ Je ne peux pas joindre le modèle de langage. "
+                    "Vérifiez qu'Ollama est lancé (`ollama serve`) "
+                    f"et que le modèle est disponible.\n\nDétail : `{exc}`"
+                )
         st.markdown(response)
         st.session_state.messages.append({"role": "assistant", "content": response})
 
