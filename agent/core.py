@@ -3,6 +3,7 @@ from agent.planner import Planner
 from services.kb_loader import KBLoader
 from services.llm import LLMService
 from services.recommender import Recommender
+from services.rag import RAGService
 from services.session_manager import SessionManager
 
 _POSITIVE_WORDS = {"oui", "yes", "ok", "d'accord", "allons-y", "commence",
@@ -21,6 +22,11 @@ class AgentCore:
         self.session_id:         str | None      = None
         self._in_recommendation: bool            = False
         self._pending_procedure: str | None      = None
+        self.rag:                RAGService      = RAGService()
+        try:
+            self.rag.index_kb(self.kb_loader)
+        except Exception:
+            pass
 
     # ------------------------------------------------------------------
     # Main entry point
@@ -97,12 +103,14 @@ class AgentCore:
         self.context.procedure_id = procedure_id
         summary     = self.kb_loader.get_procedure_summary(procedure_id)
         first_label = self.planner.missing_info_label()
+        rag_context = self.rag.query(message, n_results=2, procedure_id=procedure_id)
         system = (
             "Tu es MAA, assistant administratif marocain expert. "
             f"L'utilisateur veut : {message}.\n"
             f"Résumé de la procédure :\n{summary}\n"
             f"Plan :\n{self.planner.plan_summary()}\n"
-            f"Annonce brièvement le plan et pose la première question : "
+            + (f"Documentation officielle :\n{rag_context}\n" if rag_context else "")
+            + f"Annonce brièvement le plan et pose la première question : "
             f"'{first_label}'. Sois précis, chaleureux et professionnel. "
             "Réponds en français."
         )
@@ -239,14 +247,20 @@ class AgentCore:
     def _handle_completion(self) -> str:
         proc       = self.planner.procedure
         total_fees = self.planner.get_total_fees()
+        rag_context = self.rag.query(
+            f"etapes documents frais {proc.get('titre', '')}",
+            n_results=3,
+            procedure_id=self.context.procedure_id,
+        )
         system = (
             "Tu es MAA, assistant administratif marocain expert. "
             f"Toutes les informations ont été collectées pour : {proc.get('titre', '')}.\n"
             f"Résumé des infos : {self.context.get_collected_info()}.\n"
             f"Plan complet :\n{self.planner.plan_summary()}\n"
             f"Frais totaux estimés : {total_fees} MAD\n"
-            f"Durée estimée : {proc.get('duree_est', '—')}\n"
-            "Félicite l'utilisateur, résume les informations collectées, "
+            f"Durée estimée : {proc.get('duree_est', '-')}\n"
+            + (f"Documentation officielle :\n{rag_context}\n" if rag_context else "")
+            + "Félicite l'utilisateur, résume les informations collectées, "
             "et donne les prochaines étapes concrètes avec les documents à préparer. "
             "Réponds en français."
         )
