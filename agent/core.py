@@ -3,6 +3,7 @@ from agent.planner import Planner
 from services.kb_loader import KBLoader
 from services.llm import LLMService
 from services.recommender import Recommender
+from services.session_manager import SessionManager
 
 _POSITIVE_WORDS = {"oui", "yes", "ok", "d'accord", "allons-y", "commence",
                    "démarrer", "démarrons", "go", "parfait", "super", "bien sûr"}
@@ -11,20 +12,26 @@ _POSITIVE_WORDS = {"oui", "yes", "ok", "d'accord", "allons-y", "commence",
 class AgentCore:
 
     def __init__(self):
-        self.kb_loader:          KBLoader       = KBLoader()
-        self.planner:            Planner        = Planner(kb_loader=self.kb_loader)
-        self.context:            ContextManager = ContextManager()
-        self.llm:                LLMService     = LLMService()
-        self.recommender:        Recommender    = Recommender()
-        self._in_recommendation: bool           = False
-        self._pending_procedure: str | None     = None
+        self.kb_loader:          KBLoader        = KBLoader()
+        self.planner:            Planner         = Planner(kb_loader=self.kb_loader)
+        self.context:            ContextManager  = ContextManager()
+        self.llm:                LLMService      = LLMService()
+        self.recommender:        Recommender     = Recommender()
+        self.session_mgr:        SessionManager  = SessionManager()
+        self.session_id:         str | None      = None
+        self._in_recommendation: bool            = False
+        self._pending_procedure: str | None      = None
 
     # ------------------------------------------------------------------
     # Main entry point
     # ------------------------------------------------------------------
 
     def respond(self, user_message: str) -> str:
+        if not self.session_id:
+            self.session_id = self.session_mgr.create_session()
+
         self.context.add_message("user", user_message)
+        self.session_mgr.save_message(self.session_id, "user", user_message)
 
         if self._in_recommendation:
             response = self._handle_recommendation_collection(user_message)
@@ -38,6 +45,15 @@ class AgentCore:
             response = self._handle_completion()
 
         self.context.add_message("assistant", response)
+        self.session_mgr.save_message(self.session_id, "assistant", response)
+
+        if self.context.procedure_id:
+            self.session_mgr.update_session(
+                self.session_id, procedure_id=self.context.procedure_id
+            )
+        if self.planner.plan:
+            self._sync_steps_to_db()
+
         return response
 
     # ------------------------------------------------------------------
@@ -171,15 +187,34 @@ class AgentCore:
             )
         return self.llm.chat(self.context.get_history_for_llm(), system)
 
+    def _sync_steps_to_db(self):
+        if not self.session_id:
+            return
+        for step in self.planner.plan:
+            self.session_mgr.upsert_step_progress(
+                self.session_id,
+                step["id"],
+                step["titre"],
+                step["statut"].value,
+            )
+
     # ------------------------------------------------------------------
     # Phase 3 — Collecte d'informations (procédure en cours)
     # ------------------------------------------------------------------
 
     def _handle_collection(self, message: str) -> str:
-        missing_key = self.planner.missing_info()
+        missing_key  = self.planner.missing_info()
+        current_step = self.planner.current_step()
         if missing_key:
             self.planner.record_info(missing_key, message)
             self.context.update_info(missing_key, message)
+            if self.session_id and current_step:
+                self.session_mgr.save_collected_info(
+                    self.session_id,
+                    current_step["id"],
+                    missing_key,
+                    message,
+                )
 
         if self.planner.is_complete():
             return self._handle_completion()
@@ -222,8 +257,11 @@ class AgentCore:
     # ------------------------------------------------------------------
 
     def reset(self):
+        if self.session_id:
+            self.session_mgr.close_session(self.session_id)
         self.planner             = Planner(kb_loader=self.kb_loader)
         self.context             = ContextManager()
         self.recommender         = Recommender()
         self._in_recommendation  = False
         self._pending_procedure  = None
+        self.session_id          = None
