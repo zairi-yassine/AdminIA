@@ -1,6 +1,6 @@
 # services/llm.py
-# Ce fichier gère tous les appels au LLM via OpenRouter.
-# OpenRouter = accès unifié à des dizaines de modèles gratuits.
+# Ce fichier gère les appels au LLM (local via Ollama ou distant via OpenRouter).
+# Le provider est contrôlé par la variable d'environnement LLM_PROVIDER.
 
 import os
 from openai import OpenAI
@@ -11,16 +11,20 @@ load_dotenv()  # charge le fichier .env
 class LLMService:
 
     def __init__(self):
-        # OpenAI client pointant vers OpenRouter
-        self.client = OpenAI(
-            api_key=os.getenv("OPENROUTER_API_KEY"),
-            base_url="https://openrouter.ai/api/v1",  # <- seul changement vs OpenAI
-        )
-        # Modèles gratuits recommandés sur OpenRouter :
-        # "mistralai/mistral-7b-instruct"       ← très bon en français
-        # "meta-llama/llama-3-8b-instruct"      ← rapide et précis  
-        # "google/gemma-3-12b-it:free"          ← excellent, gratuit
-        self.model = "mistralai/mistral-7b-instruct"
+        provider = os.getenv("LLM_PROVIDER").lower()
+
+        if provider == "openrouter":
+            self.client = OpenAI(
+                api_key=os.getenv("OPENROUTER_API_KEY"),
+                base_url=os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1"),
+            )
+            self.model = os.getenv("LLM_MODEL", "google/gemma-4-31b-it:free")
+        else:
+            self.client = OpenAI(
+                api_key=os.getenv("OLLAMA_API_KEY", "ollama"),
+                base_url=os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434/v1"),
+            )
+            self.model = os.getenv("LLM_MODEL")
 
     def chat(self, messages: list, system_prompt: str = "") -> str:
         """

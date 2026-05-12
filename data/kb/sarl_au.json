@@ -1,0 +1,105 @@
+{
+  "id": "sarl_au",
+  "titre": "Création SARL à Associé Unique",
+  "description": "Procédure complète pour créer une SARL AU (Société à Responsabilité Limitée à Associé Unique) au Maroc.",
+  "organisme": ["OMPIC", "Notaire", "Banque", "Tribunal de Commerce", "DGI", "CNSS"],
+  "duree_est": "2 à 4 semaines",
+  "frais_est": { "min": 3000, "max": 5000, "devise": "MAD" },
+  "documents_constitutifs": [
+    "CIN copie certifiée",
+    "Justificatif de domicile (moins de 3 mois)",
+    "Attestation de dépôt bancaire",
+    "Statuts notariés"
+  ],
+  "etapes": [
+    {
+      "id": 1,
+      "titre": "Profil du fondateur",
+      "organisme": "—",
+      "description": "Collecte des informations personnelles du fondateur.",
+      "infos_requises": ["nom_complet", "cin", "adresse"],
+      "labels_infos": {
+        "nom_complet": "Votre nom complet (prénom et nom de famille)",
+        "cin": "Numéro de votre Carte d'Identité Nationale (CIN)",
+        "adresse": "Votre adresse de résidence complète"
+      },
+      "docs_requis": ["CIN copie certifiée", "Justificatif de domicile"],
+      "frais": 0,
+      "delai": "—",
+      "lien_officiel": ""
+    },
+    {
+      "id": 2,
+      "titre": "Capital et siège social",
+      "organisme": "—",
+      "description": "Définition du capital social, de l'adresse du siège et de l'objet social.",
+      "infos_requises": ["montant_capital", "adresse_siege", "objet_social"],
+      "labels_infos": {
+        "montant_capital": "Montant du capital social (en MAD — minimum légal : 1 MAD)",
+        "adresse_siege": "Adresse complète du siège social de la société",
+        "objet_social": "Objet social : activité principale de la société (ex: développement logiciel, commerce de détail…)"
+      },
+      "docs_requis": [],
+      "frais": 0,
+      "delai": "—",
+      "lien_officiel": ""
+    },
+    {
+      "id": 3,
+      "titre": "Certificat Négatif OMPIC",
+      "organisme": "OMPIC",
+      "description": "Réservation du nom de la société auprès de l'Office Marocain de la Propriété Industrielle et Commerciale.",
+      "infos_requises": ["nom_societe"],
+      "labels_infos": {
+        "nom_societe": "Nom souhaité pour votre société (prévoyez 2 à 3 alternatives en cas de refus)"
+      },
+      "docs_requis": ["CIN copie certifiée", "Formulaire OMPIC F1"],
+      "frais": 170,
+      "delai": "24h à 48h",
+      "lien_officiel": "https://www.ompic.ma"
+    },
+    {
+      "id": 4,
+      "titre": "Statuts notariés et dépôt du capital",
+      "organisme": "Notaire + Banque",
+      "description": "Rédaction et signature des statuts chez le notaire, puis dépôt du capital en banque pour obtenir l'attestation de blocage.",
+      "infos_requises": ["notaire_ville", "banque_choisie"],
+      "labels_infos": {
+        "notaire_ville": "Ville où se trouve votre notaire (ex: Casablanca, Rabat, Fès…)",
+        "banque_choisie": "Banque choisie pour le dépôt du capital (ex: CIH, Attijariwafa, BMCE, Banque Populaire…)"
+      },
+      "docs_requis": [
+        "Certificat négatif OMPIC",
+        "CIN copie certifiée",
+        "Justificatif de domicile"
+      ],
+      "frais": 2000,
+      "delai": "2 à 5 jours",
+      "lien_officiel": ""
+    },
+    {
+      "id": 5,
+      "titre": "Immatriculation RC + DGI + CNSS",
+      "organisme": "Tribunal de Commerce / DGI / CNSS",
+      "description": "Immatriculation au Registre de Commerce, inscription à la DGI pour l'identifiant fiscal, et enregistrement à la CNSS.",
+      "infos_requises": [],
+      "labels_infos": {},
+      "docs_requis": [
+        "Statuts notariés (original + copie certifiée)",
+        "Certificat négatif OMPIC",
+        "Attestation de dépôt du capital bancaire",
+        "CIN copie certifiée (2 exemplaires)",
+        "Formulaire RC"
+      ],
+      "frais": 350,
+      "delai": "3 à 7 jours ouvrables",
+      "lien_officiel": "https://www.registrecommerce.ma"
+    }
+  ],
+  "recommandations": {
+    "si_seul_fondateur": "SARL AU est le choix optimal — vous êtes seul propriétaire et responsable à hauteur de votre apport uniquement",
+    "capital_minimum": "1 MAD suffit légalement, mais 10 000 MAD est recommandé pour la crédibilité bancaire",
+    "avantage_fiscal": "Taux IS réduit à 10% pour bénéfice net < 300 000 MAD/an",
+    "conseil": "Ouvrez un compte bancaire professionnel dédié dès le départ — requis pour le dépôt du capital"
+  }
+}

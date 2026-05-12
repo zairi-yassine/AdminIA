@@ -1,0 +1,86 @@
+{
+  "id": "cnss",
+  "titre": "Immatriculation employeur à la CNSS",
+  "description": "Procédure d'immatriculation d'une entreprise comme employeur auprès de la Caisse Nationale de Sécurité Sociale.",
+  "organisme": ["CNSS"],
+  "duree_est": "3 à 5 jours ouvrables",
+  "frais_est": { "min": 0, "max": 0, "devise": "MAD" },
+  "documents_constitutifs": [
+    "Statuts de la société (copie certifiée)",
+    "CIN du gérant (copie certifiée)",
+    "Extrait RC (Registre de Commerce)",
+    "Identifiant Fiscal (IF)"
+  ],
+  "etapes": [
+    {
+      "id": 1,
+      "titre": "Informations sur l'entreprise",
+      "organisme": "—",
+      "description": "Collecte des informations légales de l'entreprise.",
+      "infos_requises": ["raison_sociale", "forme_juridique", "adresse_entreprise"],
+      "labels_infos": {
+        "raison_sociale": "Raison sociale (nom légal de l'entreprise tel qu'inscrit au RC)",
+        "forme_juridique": "Forme juridique (ex: SARL AU, SARL, SA, Auto-entrepreneur…)",
+        "adresse_entreprise": "Adresse complète du siège social de l'entreprise"
+      },
+      "docs_requis": ["Extrait RC", "Identifiant Fiscal (IF)"],
+      "frais": 0,
+      "delai": "—",
+      "lien_officiel": ""
+    },
+    {
+      "id": 2,
+      "titre": "Activité et effectif prévu",
+      "organisme": "—",
+      "description": "Collecte de l'activité et du nombre de salariés prévus.",
+      "infos_requises": ["secteur_activite", "nombre_salaries_prevus"],
+      "labels_infos": {
+        "secteur_activite": "Secteur d'activité principal (ex: Commerce, IT, BTP, Services, Industrie…)",
+        "nombre_salaries_prevus": "Nombre de salariés prévus à l'embauche (peut être 0 dans un premier temps)"
+      },
+      "docs_requis": [],
+      "frais": 0,
+      "delai": "—",
+      "lien_officiel": ""
+    },
+    {
+      "id": 3,
+      "titre": "Constitution et dépôt du dossier CNSS",
+      "organisme": "CNSS",
+      "description": "Préparation du formulaire d'adhésion employeur et dépôt au bureau CNSS compétent.",
+      "infos_requises": ["date_debut_activite"],
+      "labels_infos": {
+        "date_debut_activite": "Date de début d'activité de l'entreprise (JJ/MM/AAAA)"
+      },
+      "docs_requis": [
+        "Formulaire adhésion employeur CNSS (disponible sur cnss.ma)",
+        "Statuts de la société (copie certifiée)",
+        "Extrait RC",
+        "CIN du gérant (copie certifiée)",
+        "Identifiant Fiscal (IF)"
+      ],
+      "frais": 0,
+      "delai": "Traitement immédiat au guichet",
+      "lien_officiel": "https://www.cnss.ma"
+    },
+    {
+      "id": 4,
+      "titre": "Obtention du numéro employeur CNSS",
+      "organisme": "CNSS",
+      "description": "Réception de l'attestation d'immatriculation et du numéro employeur CNSS.",
+      "infos_requises": [],
+      "labels_infos": {},
+      "docs_requis": [],
+      "frais": 0,
+      "delai": "3 à 5 jours ouvrables",
+      "lien_officiel": "https://www.cnss.ma"
+    }
+  ],
+  "recommandations": {
+    "delai_legal": "L'immatriculation CNSS est obligatoire dans le mois suivant le premier recrutement",
+    "cotisations": "Taux global de cotisation : 26.96% à la charge de l'employeur + 4.48% à la charge du salarié (sur le salaire brut)",
+    "penalite": "Retard d'immatriculation → pénalités de 5% par mois de retard sur les cotisations dues",
+    "declaration": "Déclaration mensuelle obligatoire (bordereau de cotisations) avant le 10 du mois suivant",
+    "conseil": "Immatriculez également chaque salarié individuellement (numéro salarié CNSS) dès son embauche"
+  }
+}

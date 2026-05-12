@@ -1,0 +1,91 @@
+{
+  "id": "rc",
+  "titre": "Inscription au Registre de Commerce (RC)",
+  "description": "Procédure d'immatriculation au Registre de Commerce auprès du Tribunal de Commerce compétent.",
+  "organisme": ["Tribunal de Commerce", "Secrétariat-Greffe"],
+  "duree_est": "3 à 7 jours ouvrables",
+  "frais_est": { "min": 300, "max": 500, "devise": "MAD" },
+  "documents_constitutifs": [
+    "Statuts notariés (original + copies certifiées)",
+    "Certificat Négatif OMPIC",
+    "Attestation de dépôt du capital bancaire",
+    "CIN du gérant (copies certifiées)",
+    "Justificatif du siège social (bail ou titre de propriété)"
+  ],
+  "etapes": [
+    {
+      "id": 1,
+      "titre": "Vérification des documents constitutifs",
+      "organisme": "—",
+      "description": "Collecte et vérification de tous les documents nécessaires avant de se rendre au Tribunal.",
+      "infos_requises": ["raison_sociale", "forme_juridique", "ville_tribunal"],
+      "labels_infos": {
+        "raison_sociale": "Raison sociale de la société (telle que dans les statuts)",
+        "forme_juridique": "Forme juridique (ex: SARL AU, SARL, SA, SNC…)",
+        "ville_tribunal": "Ville du Tribunal de Commerce compétent (ex: Casablanca, Rabat, Fès, Marrakech, Tanger…)"
+      },
+      "docs_requis": [
+        "Statuts notariés (original)",
+        "Certificat Négatif OMPIC",
+        "Attestation bancaire de dépôt du capital"
+      ],
+      "frais": 0,
+      "delai": "—",
+      "lien_officiel": ""
+    },
+    {
+      "id": 2,
+      "titre": "Remplissage du formulaire RC",
+      "organisme": "Tribunal de Commerce",
+      "description": "Compléter le formulaire officiel d'inscription au Registre de Commerce.",
+      "infos_requises": ["objet_social", "capital_social", "date_constitution"],
+      "labels_infos": {
+        "objet_social": "Objet social (activité de la société telle que définie dans les statuts)",
+        "capital_social": "Montant du capital social (en MAD)",
+        "date_constitution": "Date de constitution de la société (date de signature des statuts, format JJ/MM/AAAA)"
+      },
+      "docs_requis": ["Formulaire RC (disponible au guichet du Tribunal de Commerce)"],
+      "frais": 0,
+      "delai": "—",
+      "lien_officiel": "https://www.registrecommerce.ma"
+    },
+    {
+      "id": 3,
+      "titre": "Dépôt du dossier complet et paiement",
+      "organisme": "Tribunal de Commerce",
+      "description": "Dépôt officiel du dossier complet au greffe du Tribunal et paiement des droits d'inscription.",
+      "infos_requises": [],
+      "labels_infos": {},
+      "docs_requis": [
+        "Formulaire RC complété et signé",
+        "Statuts notariés (original + 2 copies certifiées)",
+        "Certificat Négatif OMPIC",
+        "Attestation de dépôt du capital bancaire",
+        "CIN du gérant (2 copies certifiées)",
+        "Justificatif du siège social (bail ou titre de propriété)"
+      ],
+      "frais": 350,
+      "delai": "Traitement immédiat — dossier enregistré le jour du dépôt",
+      "lien_officiel": ""
+    },
+    {
+      "id": 4,
+      "titre": "Obtention de l'extrait RC",
+      "organisme": "Tribunal de Commerce",
+      "description": "Réception de l'extrait du Registre de Commerce (modèle J) avec le numéro RC attribué.",
+      "infos_requises": [],
+      "labels_infos": {},
+      "docs_requis": [],
+      "frais": 0,
+      "delai": "3 à 7 jours ouvrables",
+      "lien_officiel": "https://www.registrecommerce.ma"
+    }
+  ],
+  "recommandations": {
+    "ordre": "Le RC doit être obtenu APRÈS le certificat négatif OMPIC et la signature des statuts notariés",
+    "numero_rc": "Le numéro RC est obligatoire sur tous les documents commerciaux : factures, contrats, courriers officiels",
+    "radiation": "Toute modification (siège social, gérant, capital, objet) doit être déclarée au RC dans les 30 jours",
+    "copies": "Demandez au moins 5 copies certifiées de l'extrait RC dès l'obtention — nécessaires pour DGI, CNSS, banque…",
+    "conseil": "L'inscription RC donne accès au portail registrecommerce.ma pour les démarches en ligne ultérieures"
+  }
+}

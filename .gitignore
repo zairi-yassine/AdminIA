@@ -8,3 +8,28 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Environment variables (secrets)
+.env
+
+# Runtime data — SQLite database
+data/sessions.db
+
+# Runtime data — ChromaDB vectors
+data/vectors/
+
+# Dev/debug scripts (not production code)
+test_agent.py
+test_llm.py
+
+# IDE files
+workspace.code-workspace
+.idea/
+.vscode/
+
+# Project reference doc (conversation log)
+MAA_conversation_complete.md
+
+# OS
+.DS_Store
+Thumbs.db

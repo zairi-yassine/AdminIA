@@ -1,0 +1,96 @@
+{
+  "id": "ompic",
+  "titre": "Dépôt de marque à l'OMPIC",
+  "description": "Procédure de dépôt et d'enregistrement d'une marque commerciale auprès de l'Office Marocain de la Propriété Industrielle et Commerciale.",
+  "organisme": ["OMPIC"],
+  "duree_est": "12 à 18 mois (publication BOPI + délai d'opposition)",
+  "frais_est": { "min": 800, "max": 3000, "devise": "MAD" },
+  "documents_constitutifs": [
+    "CIN (personne physique) ou Extrait RC (personne morale)",
+    "Représentation de la marque (fichier haute résolution)",
+    "Liste des produits/services concernés (classes de Nice)"
+  ],
+  "etapes": [
+    {
+      "id": 1,
+      "titre": "Informations sur le déposant",
+      "organisme": "—",
+      "description": "Collecte des informations d'identité du demandeur.",
+      "infos_requises": ["nom_deposant", "type_deposant", "adresse_deposant"],
+      "labels_infos": {
+        "nom_deposant": "Nom complet du déposant (personne physique) ou dénomination sociale (personne morale)",
+        "type_deposant": "Type de déposant : 'personne physique' ou 'personne morale (société)'",
+        "adresse_deposant": "Adresse complète du déposant (domicile ou siège social)"
+      },
+      "docs_requis": ["CIN copie ou Extrait RC selon le type de déposant"],
+      "frais": 0,
+      "delai": "—",
+      "lien_officiel": ""
+    },
+    {
+      "id": 2,
+      "titre": "Définition de la marque",
+      "organisme": "—",
+      "description": "Description précise de la marque à déposer et des classes de produits/services.",
+      "infos_requises": ["nom_marque", "type_marque", "classes_nice"],
+      "labels_infos": {
+        "nom_marque": "Nom ou libellé exact de la marque à déposer",
+        "type_marque": "Type de marque : 'verbale' (texte seul), 'figurative' (logo seul) ou 'mixte' (texte + logo)",
+        "classes_nice": "Classes de Nice souhaitées (ex: classe 9 = logiciels, classe 35 = publicité, classe 42 = services IT). Précisez les numéros de classes."
+      },
+      "docs_requis": ["Représentation de la marque en haute résolution (PNG ou JPEG, fond blanc)"],
+      "frais": 0,
+      "delai": "—",
+      "lien_officiel": "https://www.wipo.int/classifications/nice/fr"
+    },
+    {
+      "id": 3,
+      "titre": "Recherche d'antériorité OMPIC",
+      "organisme": "OMPIC",
+      "description": "Vérification qu'aucune marque identique ou similaire n'est déjà enregistrée dans les classes ciblées.",
+      "infos_requises": [],
+      "labels_infos": {},
+      "docs_requis": [],
+      "frais": 200,
+      "delai": "24h à 48h (en ligne sur ompic.ma)",
+      "lien_officiel": "https://www.ompic.ma/fr/recherche-marques"
+    },
+    {
+      "id": 4,
+      "titre": "Dépôt officiel du dossier OMPIC",
+      "organisme": "OMPIC",
+      "description": "Dépôt du dossier complet et paiement des droits de dépôt (650 MAD par classe).",
+      "infos_requises": [],
+      "labels_infos": {},
+      "docs_requis": [
+        "Formulaire OMPIC M01 (3 exemplaires)",
+        "Représentation de la marque (24 exemplaires en couleur)",
+        "Liste détaillée des produits/services par classe",
+        "CIN ou Extrait RC du déposant",
+        "Pouvoir (si dépôt par mandataire)"
+      ],
+      "frais": 650,
+      "delai": "Immédiat — la date de dépôt est enregistrée le jour même",
+      "lien_officiel": "https://www.ompic.ma"
+    },
+    {
+      "id": 5,
+      "titre": "Publication BOPI et délai d'opposition",
+      "organisme": "OMPIC / BOPI",
+      "description": "Publication au Bulletin Officiel de la Propriété Industrielle, suivi d'un délai d'opposition de 2 mois ouvert aux tiers.",
+      "infos_requises": [],
+      "labels_infos": {},
+      "docs_requis": [],
+      "frais": 0,
+      "delai": "2 à 3 mois pour la publication + 2 mois délai d'opposition",
+      "lien_officiel": "https://www.ompic.ma/fr/bopi"
+    }
+  ],
+  "recommandations": {
+    "protection": "La marque enregistrée est protégée pendant 10 ans, renouvelable indéfiniment",
+    "territorialite": "Protection limitée au territoire marocain — pour une protection internationale, utiliser le Système de Madrid (OMPI)",
+    "classes": "Déposez dans toutes les classes liées à votre activité actuelle ET à votre développement futur prévu",
+    "tarif_classes": "Frais de dépôt : 650 MAD pour la 1ère classe + 400 MAD par classe supplémentaire",
+    "conseil": "Consultez un mandataire agréé OMPIC pour les marques complexes ou les dépôts multi-classes (> 3 classes)"
+  }
+}

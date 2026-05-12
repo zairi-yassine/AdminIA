@@ -1,0 +1,87 @@
+{
+  "id": "dgi",
+  "titre": "Obtention de l'Identifiant Fiscal (IF) — DGI",
+  "description": "Procédure d'inscription à la Direction Générale des Impôts pour obtenir l'identifiant fiscal et choisir le régime TVA.",
+  "organisme": ["DGI"],
+  "duree_est": "1 à 3 jours ouvrables",
+  "frais_est": { "min": 0, "max": 0, "devise": "MAD" },
+  "documents_constitutifs": [
+    "Extrait RC (Registre de Commerce)",
+    "Statuts de la société (copie certifiée)",
+    "CIN du gérant (copie certifiée)",
+    "Justificatif du siège social (bail commercial ou titre de propriété)"
+  ],
+  "etapes": [
+    {
+      "id": 1,
+      "titre": "Informations légales de l'entreprise",
+      "organisme": "—",
+      "description": "Collecte des informations légales requises pour l'inscription à la DGI.",
+      "infos_requises": ["raison_sociale", "forme_juridique", "rc_numero"],
+      "labels_infos": {
+        "raison_sociale": "Raison sociale exacte de l'entreprise (telle qu'inscrite au RC)",
+        "forme_juridique": "Forme juridique (ex: SARL AU, SARL, SA, SNC, Auto-entrepreneur…)",
+        "rc_numero": "Numéro d'inscription au Registre de Commerce"
+      },
+      "docs_requis": ["Extrait RC", "Statuts de la société"],
+      "frais": 0,
+      "delai": "—",
+      "lien_officiel": ""
+    },
+    {
+      "id": 2,
+      "titre": "Activité et régime fiscal",
+      "organisme": "—",
+      "description": "Détermination du régime d'imposition (IS ou IR) et du régime TVA.",
+      "infos_requises": ["activite_principale", "chiffre_affaires_prevu", "regime_tva"],
+      "labels_infos": {
+        "activite_principale": "Description précise de l'activité principale (ex: développement logiciel, vente de matériel, restauration…)",
+        "chiffre_affaires_prevu": "Chiffre d'affaires annuel prévisionnel (en MAD)",
+        "regime_tva": "Régime TVA souhaité : 'encaissements' (TVA sur encaissements reçus) ou 'debit' (TVA sur factures émises)"
+      },
+      "docs_requis": [],
+      "frais": 0,
+      "delai": "—",
+      "lien_officiel": ""
+    },
+    {
+      "id": 3,
+      "titre": "Dépôt du dossier à la DGI",
+      "organisme": "DGI",
+      "description": "Dépôt du formulaire d'inscription et des pièces justificatives à la Direction Régionale des Impôts compétente.",
+      "infos_requises": ["direction_dgi_ville"],
+      "labels_infos": {
+        "direction_dgi_ville": "Ville de la Direction Régionale des Impôts compétente (ex: Casablanca, Rabat, Marrakech, Fès, Tanger…)"
+      },
+      "docs_requis": [
+        "Formulaire DGI inscription (formulaire ADN, disponible sur tax.gov.ma)",
+        "Extrait RC (original)",
+        "Statuts de la société (copie certifiée)",
+        "CIN du gérant (copie certifiée)",
+        "Bail commercial ou titre de propriété du siège social"
+      ],
+      "frais": 0,
+      "delai": "Traitement immédiat au guichet",
+      "lien_officiel": "https://www.tax.gov.ma"
+    },
+    {
+      "id": 4,
+      "titre": "Réception de l'Identifiant Fiscal",
+      "organisme": "DGI",
+      "description": "Réception de l'attestation d'identifiant fiscal et activation du compte fiscal en ligne (portail SIMPL).",
+      "infos_requises": [],
+      "labels_infos": {},
+      "docs_requis": [],
+      "frais": 0,
+      "delai": "1 à 3 jours ouvrables",
+      "lien_officiel": "https://www.simpl.tax.gov.ma"
+    }
+  ],
+  "recommandations": {
+    "tva_seuil": "TVA obligatoire si CA annuel > 500 000 MAD — en dessous de ce seuil, vous en êtes exonéré",
+    "is_regime": "Impôt sur les Sociétés (IS) : 10% pour bénéfice < 300K MAD, 20% pour 300K–1M MAD, 31% au-delà",
+    "simpl": "Activez votre espace SIMPL (simpl.tax.gov.ma) dès réception de l'IF pour les déclarations en ligne",
+    "conseil": "L'IF est obligatoire sur toutes les factures émises — ne démarrez pas la facturation sans lui",
+    "patente": "La taxe professionnelle (ex-patente) est également à déclarer à la DGI en même temps que l'IF"
+  }
+}
