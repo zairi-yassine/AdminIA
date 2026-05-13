@@ -1,4 +1,4 @@
-# MAA — Session de Travail Jour 1 à Jour 5
+# MAA — Session de Travail Jour 1 à Jour 8
 
 ## Documentation Complète de la Conversation
 
@@ -22,6 +22,10 @@
 9. [Jour 4 — Export PDF + App v0.5](#9-jour-4--export-pdf--app-v05)
 10. [Jour 5 — RAG + ChromaDB](#10-jour-5--rag--chromadb)
 11. [État final du projet](#11-état-final-du-projet)
+12. [Commandes de référence](#12-commandes-de-référence)
+13. [Jour 6 — Bilingue AR/FR + PDF 2 pages](#13-jour-6--bilingue-arfr--pdf-2-pages)
+14. [Jour 7 — MLflow Tracking](#14-jour-7--mlflow-tracking)
+15. [Jour 8 — CI/CD + README + Docs finale](#15-jour-8--cicd--readme--docs-finale)
 
 ---
 
@@ -88,9 +92,9 @@ Le fichier `MAA_conversation_complete.md` a été lu intégralement. Il contient
 | **Mercredi S1** | Multi-sessions + Streamlit | UI + sessions persistantes  | ✅  |
 | **Jeudi S1**    | Polish + Export PDF        | App complète v0.5           | ✅  |
 | **Lundi S2**    | RAG + ChromaDB             | Zéro hallucination          | ✅  |
-| Mardi S2        | PDF formulaires + Arabe    | PDF pré-rempli + bilingue   |
-| Mercredi S2     | MLflow + 20 tests          | Dashboard + métriques       |
-| Jeudi S2        | Rapport + Démo             | Projet 100% livré           |
+| Mardi S2        | PDF formulaires + Arabe    | PDF pré-rempli + bilingue   | ✅  |
+| Mercredi S2     | MLflow + 20 tests          | Dashboard + métriques       | ✅  |
+| Jeudi S2        | Rapport + Démo             | Projet 100% livré           | ✅  |
 
 ---
 
@@ -795,7 +799,10 @@ ollama serve                          # Terminal 1 — laisser ouvert
 uv run streamlit run app.py           # → http://localhost:8501
 
 # Tests
-uv run pytest tests/ -v              # 86 tests
+uv run pytest tests/ -v              # 142 tests
+
+# Dashboard MLflow
+uv run mlflow ui --backend-store-uri sqlite:///data/mlflow.db  # → http://localhost:5000
 
 # Git
 git add -A
@@ -805,4 +812,162 @@ git push origin main
 
 ---
 
-_Document mis à jour — Session Jours 1 à 5 — MAA · 12 Mai 2026_
+## 13. Jour 6 — Bilingue AR/FR + PDF 2 pages
+
+### Fichiers créés
+
+- **`services/i18n.py`** — 60 traductions (30 clés × FR + AR) + `PROCEDURE_TITLES_AR` + `STEP_STATUS_AR` + `t(key, lang)` avec fallbacks
+- **`tools/pdf_bilingual.py`** — `BilingualPDFGenerator(PDFGenerator)` : Page 1 FR + Page 2 AR (Arial TTF + `arabic_reshaper` + `python-bidi`)
+
+### Interface `BilingualPDFGenerator`
+
+```python
+class BilingualPDFGenerator(PDFGenerator):
+    def generate_bilingual(
+        procedure, collected_info, plan, session_id=""
+    ) -> bytes  # PDF 2 pages : FR + AR
+```
+
+### Pipeline Arabic (Page 2)
+
+```
+texte arabe → arabic_reshaper.reshape() → bidi.get_display() → fpdf.cell(align="R")
+Police      : C:/Windows/Fonts/arial.ttf (Windows) · fallbacks Linux/macOS
+```
+
+### Améliorations `app.py` (v0.6)
+
+- Sélecteur `Français 🇫🇷 / العربية 🇲🇦` dans la sidebar (`st.session_state.lang`)
+- Injection CSS RTL (`direction: rtl`) quand `lang == "ar"`
+- Tous les labels via `t(key, lang)` — titre, caption, sidebar, chat input, boutons
+- `BilingualPDFGenerator` remplace `PDFGenerator` pour le bouton de téléchargement
+
+### Tests Jour 6
+
+- `tests/test_i18n.py` — 27 tests (structure, `t()`, clés critiques, PROCEDURE_TITLES_AR, STEP_STATUS_AR)
+- `tests/test_pdf_bilingual.py` — 8 tests (bytes, header `%PDF`, taille bilingue > FR seul, statuts, procédures)
+
+**Total cumulé : 121 tests ✅ · Commit Jour 6 pushé**
+
+---
+
+## 14. Jour 7 — MLflow Tracking
+
+### Fichiers créés
+
+- **`services/mlflow_tracker.py`** — `MLflowTracker` : lifecycle session + métriques
+
+### Interface `MLflowTracker`
+
+```python
+class MLflowTracker:
+    def start_session(session_id, procedure_id=None, lang="fr", llm_model="llama3.2") -> str
+    def end_session(completed=False)
+    def log_response(response_time_ms, intent=None, step=0)
+    def log_progress(progress, steps_done, steps_total, step=0)
+    def is_active() -> bool
+```
+
+### Ce qui est tracké
+
+| Type     | Clé                                       | Description      |
+| -------- | ----------------------------------------- | ---------------- |
+| Param    | `procedure_id`, `llm_model`               | Par session      |
+| Tag      | `session_id`, `lang`                      | Par session      |
+| Métrique | `response_time_ms`, `intent_detected`     | Par appel (step) |
+| Métrique | `progress`, `steps_done`, `steps_total`   | Par appel (step) |
+| Métrique | `session_duration_s`, `session_completed` | Fin de session   |
+
+### Intégration `agent/core.py`
+
+- `__init__` : `self.tracker = MLflowTracker()` + `self._call_count = 0`
+- `respond()` 1er appel : `tracker.start_session()`
+- `respond()` après chaque appel : `time.perf_counter()` → `log_response()` + `log_progress()`
+- `reset()` : `tracker.end_session(completed=planner.is_complete())`
+- Tous les hooks dans `try/except` — non bloquant
+
+### Dashboard
+
+```powershell
+uv run mlflow ui --backend-store-uri sqlite:///data/mlflow.db
+# → http://localhost:5000  (Experiment : maa_agent)
+```
+
+**Total cumulé : 142 tests ✅ · Commit Jour 7 pushé**
+
+---
+
+## 15. Jour 8 — CI/CD + README + Docs finale
+
+### Fichiers créés
+
+- **`.github/workflows/ci.yml`** — GitHub Actions CI (Python 3.12 + 3.13, ubuntu-latest)
+- **`README.md`** — README complet avec badges CI, architecture, install, tests, métriques
+
+### Pipeline CI (`.github/workflows/ci.yml`)
+
+```yaml
+on: [push, pull_request] # branches: main
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy.matrix.python-version: ["3.12", "3.13"]
+    steps:
+      - checkout → setup uv → uv sync --all-groups → pytest tests/ -v
+```
+
+### `README.md` — Contenu
+
+- Badges : CI · Python 3.12+ · 142 tests · MLflow
+- Présentation + 7 features clés
+- Table des 5 procédures avec durées
+- Architecture 5 couches (diagramme ASCII)
+- Prérequis + Installation + Lancement
+- Table des 8 suites de tests
+- Arbre complet du projet
+- Variables d'environnement
+- Tableau métriques 8 jours
+
+### Changement `pyproject.toml`
+
+```toml
+requires-python = ">=3.12"  # était >=3.14, uniformisé pour CI
+```
+
+**Total cumulé : 142 tests ✅ · Commit Jour 8 pushé**
+
+---
+
+## 16. État final du projet — Jours 1 à 8
+
+### Métriques globales
+
+| Métrique             | Valeur           |
+| -------------------- | ---------------- |
+| Tests unitaires      | **142 / 142 ✅** |
+| Fichiers source      | **~30 fichiers** |
+| Commits Git          | **8 commits**    |
+| Langues UI           | **FR + AR**      |
+| Procédures couvertes | **5**            |
+| Documents KB indexés | **27**           |
+| Dépendances          | **12**           |
+
+### Arbre complet final
+
+```
+MAA/
+├── .github/workflows/ci.yml
+├── agent/  core.py · planner.py · context.py
+├── services/  llm.py · kb_loader.py · rag.py · session_manager.py
+│            recommender.py · i18n.py · mlflow_tracker.py
+├── tools/  doc_gen.py · pdf_bilingual.py
+├── data/  kb/(5 JSON) · db.py
+├── tests/  8 suites · 142 tests
+├── docs/  JOUR1.md … JOUR8.md
+├── app.py · pyproject.toml · README.md
+└── .env.example · .gitignore
+```
+
+---
+
+_Document mis à jour — Session Jours 1 à 8 — MAA · 13 Mai 2026_

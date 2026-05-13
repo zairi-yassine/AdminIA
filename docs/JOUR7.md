@@ -9,19 +9,19 @@
 
 ### Fichiers créés
 
-| Fichier | Description |
-|---|---|
-| `services/mlflow_tracker.py` | `MLflowTracker` — tracking sessions + métriques |
-| `tests/test_mlflow_tracker.py` | 21 tests |
+| Fichier                        | Description                                     |
+| ------------------------------ | ----------------------------------------------- |
+| `services/mlflow_tracker.py`   | `MLflowTracker` — tracking sessions + métriques |
+| `tests/test_mlflow_tracker.py` | 21 tests                                        |
 
 ### Fichiers modifiés
 
-| Fichier | Changement |
-|---|---|
-| `agent/core.py` | Import + init `MLflowTracker` + hooks dans `respond()` + `reset()` |
-| `pyproject.toml` | +`mlflow>=2.12.0` |
-| `requirements.txt` | idem |
-| `.gitignore` | +`data/mlflow.db`, `mlruns/` |
+| Fichier            | Changement                                                         |
+| ------------------ | ------------------------------------------------------------------ |
+| `agent/core.py`    | Import + init `MLflowTracker` + hooks dans `respond()` + `reset()` |
+| `pyproject.toml`   | +`mlflow>=2.12.0`                                                  |
+| `requirements.txt` | idem                                                               |
+| `.gitignore`       | +`data/mlflow.db`, `mlruns/`                                       |
 
 ---
 
@@ -61,34 +61,34 @@ Run name   : "session_{session_id[:8]}"
 
 ### Paramètres (par session)
 
-| Paramètre | Valeur exemple |
-|---|---|
-| `procedure_id` | `"sarl_au"` |
-| `llm_model` | `"llama3.2"` |
+| Paramètre      | Valeur exemple |
+| -------------- | -------------- |
+| `procedure_id` | `"sarl_au"`    |
+| `llm_model`    | `"llama3.2"`   |
 
 ### Tags (par session)
 
-| Tag | Valeur exemple |
-|---|---|
+| Tag          | Valeur exemple   |
+| ------------ | ---------------- |
 | `session_id` | `"a1b2c3d4-..."` |
-| `lang` | `"fr"` ou `"ar"` |
+| `lang`       | `"fr"` ou `"ar"` |
 
 ### Métriques (par appel, avec `step`)
 
-| Métrique | Description |
-|---|---|
+| Métrique           | Description                                |
+| ------------------ | ------------------------------------------ |
 | `response_time_ms` | Latence totale de `respond()` (LLM inclus) |
-| `intent_detected` | 1 si intent ≠ unknown, 0 sinon |
-| `progress` | Taux de complétion (0.0 → 1.0) |
-| `steps_done` | Nombre d'étapes complétées |
-| `steps_total` | Nombre d'étapes total |
+| `intent_detected`  | 1 si intent ≠ unknown, 0 sinon             |
+| `progress`         | Taux de complétion (0.0 → 1.0)             |
+| `steps_done`       | Nombre d'étapes complétées                 |
+| `steps_total`      | Nombre d'étapes total                      |
 
 ### Métriques (fin de session)
 
-| Métrique | Description |
-|---|---|
+| Métrique             | Description                           |
+| -------------------- | ------------------------------------- |
 | `session_duration_s` | Durée totale de la session (secondes) |
-| `session_completed` | 1 si procédure terminée, 0 sinon |
+| `session_completed`  | 1 si procédure terminée, 0 sinon      |
 
 ---
 
@@ -181,14 +181,14 @@ def tracker(tmp_path):
     return MLflowTracker(tracking_uri=uri)
 ```
 
-| Groupe | Tests |
-|---|---|
-| État initial | `not_active`, `run_id_none`, `experiment_name_constant` |
-| `start_session()` | `returns_run_id`, `is_active`, `run_id_set`, with `procedure_id`, `lang`, `llm_model` |
-| `end_session()` | `not_active_after`, `run_id_none_after`, `completed_true`, `completed_false`, `no_error_sans_run` |
-| `log_response()` | `no_error`, `sans_run`, `unknown_intent` |
-| `log_progress()` | `no_error`, `sans_run`, `complete` |
-| Replay | `new_session_after_end` |
+| Groupe            | Tests                                                                                             |
+| ----------------- | ------------------------------------------------------------------------------------------------- |
+| État initial      | `not_active`, `run_id_none`, `experiment_name_constant`                                           |
+| `start_session()` | `returns_run_id`, `is_active`, `run_id_set`, with `procedure_id`, `lang`, `llm_model`             |
+| `end_session()`   | `not_active_after`, `run_id_none_after`, `completed_true`, `completed_false`, `no_error_sans_run` |
+| `log_response()`  | `no_error`, `sans_run`, `unknown_intent`                                                          |
+| `log_progress()`  | `no_error`, `sans_run`, `complete`                                                                |
+| Replay            | `new_session_after_end`                                                                           |
 
 ---
 
@@ -230,4 +230,4 @@ uv run mlflow ui --backend-store-uri sqlite:///data/mlflow.db
 
 ---
 
-*Fin de la documentation Jour 7*
+_Fin de la documentation Jour 7_
