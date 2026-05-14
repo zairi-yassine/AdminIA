@@ -62,7 +62,9 @@
 ## ⚙️ Prérequis
 
 - [uv](https://github.com/astral-sh/uv) ≥ 0.4
-- [Ollama](https://ollama.com) installé et en cours d'exécution
+- **Option 1** : [Ollama](https://ollama.com) installé et en cours d'exécution (LLM local)
+- **Option 2** : Clé API [Groq](https://console.groq.com) (LLM distant ultra-rapide)
+- **Option 3** : Clé API [OpenRouter](https://openrouter.ai) (LLM distant)
 - Python 3.12+ (géré automatiquement par uv)
 
 ---
@@ -79,16 +81,18 @@ uv sync
 
 # 3. Configurer l'environnement
 Copy-Item .env.example .env
-# Éditer .env si nécessaire (LLM_PROVIDER, LLM_MODEL)
+# Éditer .env pour choisir le provider LLM :
+#   LLM_PROVIDER=groq    # ou ollama | openrouter
+#   LLM_MODEL=llama-3.3-70b-versatile  # modèle Groq
 
-# 4. Télécharger le modèle LLM
+# 4. Si Ollama : télécharger le modèle
 ollama pull llama3.2
 ```
 
 ## ▶️ Lancement
 
 ```powershell
-# Terminal 1 — Laisser ouvert
+# Si Ollama : Terminal 1 — Laisser ouvert
 ollama serve
 
 # Terminal 2 — Application web

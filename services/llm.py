@@ -1,5 +1,5 @@
 # services/llm.py
-# Ce fichier gère les appels au LLM (local via Ollama ou distant via OpenRouter).
+# Ce fichier gère les appels au LLM (Ollama, Groq ou OpenRouter).
 # Le provider est contrôlé par la variable d'environnement LLM_PROVIDER.
 
 import os
@@ -13,18 +13,24 @@ class LLMService:
     def __init__(self):
         provider = os.getenv("LLM_PROVIDER").lower()
 
-        if provider == "openrouter":
+        if provider == "groq":
+            self.client = OpenAI(
+                api_key=os.getenv("GROQ_API_KEY"),
+                base_url="https://api.groq.com/openai/v1",
+            )
+            self.model = os.getenv("LLM_MODEL", "llama-3.3-70b-versatile")
+        elif provider == "openrouter":
             self.client = OpenAI(
                 api_key=os.getenv("OPENROUTER_API_KEY"),
                 base_url=os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1"),
             )
             self.model = os.getenv("LLM_MODEL", "google/gemma-4-31b-it:free")
-        else:
+        else:  # ollama (défaut)
             self.client = OpenAI(
                 api_key=os.getenv("OLLAMA_API_KEY", "ollama"),
                 base_url=os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434/v1"),
             )
-            self.model = os.getenv("LLM_MODEL")
+            self.model = os.getenv("LLM_MODEL", "llama3.2")
 
     def chat(self, messages: list, system_prompt: str = "") -> str:
         """
